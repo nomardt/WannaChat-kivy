@@ -1,6 +1,5 @@
 import socket
 import threading
-import sys
 # pip install kivy
 import kivy
 from kivy.app import App
@@ -11,21 +10,27 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.lang import Builder
 from kivy.core.window import WindowBase
-from kivy.clock import Clock, mainthread
+from kivy.clock import Clock
 # Making the app look sharper on Windows systems
 try:
     from ctypes import windll, c_int64
     windll.user32.SetProcessDpiAwarenessContext(c_int64(-4))
 
-except:
+except ModuleNotFoundError:
     pass
 
+except Exception:
+    exit()
 
-# The first screen
+
 class EnterIP(Screen):
-    # This method is launched when the user presses "enter"
+    """
+    The first screen where the user enters the IP address of the server.
+    """
     def establish_connection(self):
-        # Establishing the connection
+        """
+        Establishing the connection after 'enter' is pressed
+        """
         server_address = self.address.text
         server_port = 12345
 
@@ -42,13 +47,20 @@ class EnterIP(Screen):
 
 # The second screen
 class EnterNickname(Screen):
-    # This method is launched when the user presses "enter"
+    """
+    The second screen where the user enters her/his nickname
+    """
     def check_if_nickname_is_entered(self):
+        """
+        Checking if the user has entered a nickname after she/he presses 'enter' 
+        """
         if len(self.nickname.text) > 0:
             self.check_if_nickname_is_taken()
 
-    # The method where the nickname is checked against the server's list of nicknames
     def check_if_nickname_is_taken(self):
+        """
+        The nickname the user entered is checked against the server's list of nicknames
+        """
         client.send(self.nickname.text.encode('utf-8'))
 
         # The server returns 'STATUS:FAILURE' if the entered nickname is already present
@@ -66,31 +78,42 @@ class EnterNickname(Screen):
             ChatMainPage().start_receive_thread()
 
 
-# The third screen
 class ChatMainPage(Screen):
+    """
+    The third screen with the functionality to send messages and read the ones written by other clients
+    """
     def __init__(self, **kw):
+        """
+        It refreshes the chat history window
+        """
         super().__init__(**kw)
 
         # This constantly adds to GUI the elements stored in add_to_gui
         Clock.schedule_interval(self.receive_helper, 0.5)
 
-    # The method to send is called whenever the user presses the "send" button
     def message_send(self):
+        """
+        It sends the message after the user has pressed the "send" button
+        """
         try:
             client.send(self.entered_message.text.encode('utf-8'))
 
             self.entered_message.text = ""
             
         except (ConnectionAbortedError, ConnectionResetError):
-            sys.exit()
+            exit()
 
-    # The method to start the receiving thread
     def start_receive_thread(self):
+        """
+        It starts the receiving thread
+        """
         self.receive_thread = threading.Thread(target=self.receive)
         self.receive_thread.start()
 
-    # The receive method, works in a thread
     def receive(self):
+        """
+        It is constantly waiting for messages from the server, works in a thread
+        """
         global add_to_gui
 
         while True:
@@ -98,12 +121,13 @@ class ChatMainPage(Screen):
                 add_to_gui += client.recv(1024).decode('utf-8') + "\n"
                 
             except ConnectionResetError:
-                sys.exit()
+                exit()
 
-    # Kivy can't change GUI elements outside the main thread so this method is needed
     def receive_helper(self, *aw):
-        if len(add_to_gui) > 2:
-            self.chat_history.text = add_to_gui
+        """
+        Kivy can't change GUI elements outside the main thread so this method is needed
+        """
+        self.chat_history.text = add_to_gui
 
 
 class Manager(ScreenManager):

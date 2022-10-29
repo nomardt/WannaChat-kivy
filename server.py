@@ -4,8 +4,10 @@ import random
 #pip install loguru
 from loguru import logger
 
-# The method is used to wait for new connections and start threads for new users
 def authenticate_new_users():
+    """
+    The method is used to wait for new connections and start threads for new users
+    """
     while True:
         # Waiting for a new connection
         connection, address = server.accept()
@@ -35,10 +37,16 @@ def authenticate_new_users():
             connection.close()
             logger.info(str(address) + " disconnected!")
 
-# This method is put in a thread for every connected user with a nickname
 def handle_the_connection(connection, nickname):
+    """
+    This method receives the messages from the connected client.
+    It is put in a thread for every connected user with a nickname.
+
+    :type connection: Socket object
+    :type nickname: string
+    """
     while True:
-        # Error would occur when the user disconnects from the server
+        # Error will occur when the user disconnects from the server
         try:
             message = connection.recv(1024).decode('utf-8')
             broadcast(nickname + " > " + message)
@@ -50,25 +58,33 @@ def handle_the_connection(connection, nickname):
             broadcast(nickname + " disconnected!")
             break
 
-# It is called whenever one wants to send something to every connected client
 def broadcast(message):
+    """
+    It sends the message to every connected client
+
+    :type message: string
+    """
     logger.info("BROADCAST | " + str(message))
     
     for client in clients:
         client.send(message.encode('utf-8'))
 
-# The method is called when the user has chosen a unique nickname
 def generate_a_welcome_message(nickname):
-    messages = {
-        1: nickname + " just connected!",
-        2: nickname + " just entered the party!",
-        3: "Hello, " + nickname + "! Hope you brought pancakes!",
-        4: "A wild brown " + nickname + " just appeared!",
-        5: "Everyone welcome " + nickname + "!"
-    }
+    """
+    It broadcasts a random welcome message after the user has chosen a unique nickname
 
-    random_key = random.randint(1, 5)
-    broadcast(messages[random_key])
+    :type nickname: string
+    """
+    messages = (
+               nickname + " just connected!",
+               nickname + " just entered the party!",
+               "Hello, " + nickname + "! Hope you brought pancakes!", 
+               "A wild brown " + nickname + " just appeared!", 
+               "Everyone welcome " + nickname + "!"
+               )
+
+    random_greeting = random.choice(messages)
+    broadcast(random_greeting)
 
 if __name__ == "__main__":
     # Initial TCP Server setup
