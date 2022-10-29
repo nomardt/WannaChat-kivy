@@ -1,2 +1,2 @@
 # WannaChat kivy
-A messanging app written in python
+A messanging app built in python with the help of kivy framework. Both client-side and server-side.
