@@ -97,8 +97,6 @@ class ChatMainPage(Screen):
 
     # Kivy can't change GUI elements outside the main thread so this method is needed
     def receive_helper(self, *aw):
-        global add_to_gui
-
         if len(add_to_gui) > 2:
             self.chat_history.text = add_to_gui
 
