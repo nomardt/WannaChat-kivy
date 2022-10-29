@@ -91,6 +91,7 @@ class ChatMainPage(Screen):
         while True:
             try:
                 add_to_gui += client.recv(1024).decode('utf-8') + "\n"
+                
             except ConnectionResetError:
                 sys.exit()
 
