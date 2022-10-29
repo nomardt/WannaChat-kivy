@@ -78,6 +78,8 @@ class ChatMainPage(Screen):
     def message_send(self):
         try:
             client.send(self.entered_message.text.encode('utf-8'))
+
+            self.entered_message.text = ""
             
         except (ConnectionAbortedError, ConnectionResetError):
             sys.exit()
