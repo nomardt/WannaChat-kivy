@@ -68,7 +68,7 @@ class ChatMainPage(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
 
-        #This constantly adds to GUI the element stored in add_to_gui
+        #This constantly adds to GUI the elements stored in add_to_gui
         Clock.schedule_interval(self.receive_helper, 0.5)
 
     # The method to send is called whenever the user presses the "send" button
