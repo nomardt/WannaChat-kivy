@@ -21,6 +21,7 @@ except:
     pass
 
 
+# The first screen
 class EnterIP(Screen):
     # This method is launched when the user presses "enter"
     def establish_connection(self):
@@ -39,6 +40,7 @@ class EnterIP(Screen):
             self.label_not_found.text = "Server not found!"
 
 
+# The second screen
 class EnterNickname(Screen):
     # This method is launched when the user presses "enter"
     def check_if_nickname_is_entered(self):
@@ -64,6 +66,7 @@ class EnterNickname(Screen):
             ChatMainPage().start_receive_thread()
 
 
+# The third screen
 class ChatMainPage(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -84,7 +87,7 @@ class ChatMainPage(Screen):
         self.receive_thread = threading.Thread(target=self.receive)
         self.receive_thread.start()
 
-    # The receive method
+    # The receive method, works in a thread
     def receive(self):
         global add_to_gui
 
@@ -114,6 +117,7 @@ class WannaChatApp(App):
 if __name__ == "__main__":
     kivy.require("1.9.0")
 
+    # String to store the chat history
     add_to_gui = ""
 
     # Creating the client for the TCP connection
