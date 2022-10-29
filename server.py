@@ -38,7 +38,7 @@ def handle_the_connection(connection, nickname):
     while True:
         try:
             message = connection.recv(1024).decode('utf-8')
-            broadcast(nickname + ": " + message)
+            broadcast(nickname + " > " + message)
 
         except:
             clients.remove(connection)

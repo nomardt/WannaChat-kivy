@@ -1,7 +1,6 @@
 import socket
 import threading
 import sys
-from functools import partial
 # pip install kivy
 import kivy
 from kivy.app import App
@@ -20,8 +19,7 @@ try:
 
 except:
     pass
-    
-kivy.require("2.1.0")
+
 
 class EnterIP(Screen):
     # This method is launched when the user presses "enter"
@@ -60,11 +58,19 @@ class EnterNickname(Screen):
             self.nickname.text = ""
 
         else:
+            # Proceeding to the next screen if the nickname is available
             self.manager.current = "WannaChat_main"
+
             ChatMainPage().start_receive_thread()
 
 
 class ChatMainPage(Screen):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+
+        #This constantly adds to GUI the element stored in add_to_gui
+        Clock.schedule_interval(self.receive_helper, 0.5)
+
     # The method to send is called whenever the user presses the "send" button
     def message_send(self):
         try:
@@ -80,17 +86,20 @@ class ChatMainPage(Screen):
 
     # The receive method
     def receive(self):
+        global add_to_gui
+
         while True:
             try:
-                received_message = client.recv(1024).decode('utf-8')
-                Clock.schedule_once(partial(self.receive_helper, received_message), 0.5)
+                add_to_gui += client.recv(1024).decode('utf-8') + "\n"
             except ConnectionResetError:
                 sys.exit()
 
     # Kivy can't change GUI elements outside the main thread so this method is needed
-    def receive_helper(self, message, *args):
-        print("received " + message)
-        self.chat_history.text += message + "\n"
+    def receive_helper(self, *aw):
+        global add_to_gui
+
+        if len(add_to_gui) > 2:
+            self.chat_history.text = add_to_gui
 
 
 class Manager(ScreenManager):
@@ -104,6 +113,10 @@ class WannaChatApp(App):
 
 
 if __name__ == "__main__":
+    kivy.require("1.9.0")
+
+    add_to_gui = ""
+
     # Creating the client for the TCP connection
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
