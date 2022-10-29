@@ -4,7 +4,7 @@ import random
 #pip install loguru
 from loguru import logger
 
-def authenticate_new_users():
+def authenticate_new_users() -> None:
     """
     The method is used to wait for new connections and start threads for new users
     """
@@ -37,7 +37,7 @@ def authenticate_new_users():
             connection.close()
             logger.info(str(address) + " disconnected!")
 
-def handle_the_connection(connection, nickname):
+def handle_the_connection(connection, nickname) -> None:
     """
     This method receives the messages from the connected client.
     It is put in a thread for every connected user with a nickname.
@@ -58,7 +58,7 @@ def handle_the_connection(connection, nickname):
             broadcast(nickname + " disconnected!")
             break
 
-def broadcast(message):
+def broadcast(message) -> None:
     """
     It sends the message to every connected client
 
@@ -69,7 +69,7 @@ def broadcast(message):
     for client in clients:
         client.send(message.encode('utf-8'))
 
-def generate_a_welcome_message(nickname):
+def generate_a_welcome_message(nickname) -> None:
     """
     It broadcasts a random welcome message after the user has chosen a unique nickname
 

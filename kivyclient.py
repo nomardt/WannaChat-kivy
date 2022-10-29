@@ -27,7 +27,7 @@ class EnterIP(Screen):
     """
     The first screen where the user enters the IP address of the server.
     """
-    def establish_connection(self):
+    def establish_connection(self) -> None:
         """
         Establishing the connection after 'enter' is pressed
         """
@@ -50,14 +50,14 @@ class EnterNickname(Screen):
     """
     The second screen where the user enters her/his nickname
     """
-    def check_if_nickname_is_entered(self):
+    def check_if_nickname_is_entered(self) -> None:
         """
         Checking if the user has entered a nickname after she/he presses 'enter' 
         """
         if len(self.nickname.text) > 0:
             self.check_if_nickname_is_taken()
 
-    def check_if_nickname_is_taken(self):
+    def check_if_nickname_is_taken(self) -> None:
         """
         The nickname the user entered is checked against the server's list of nicknames
         """
@@ -91,7 +91,7 @@ class ChatMainPage(Screen):
         # This constantly adds to GUI the elements stored in add_to_gui
         Clock.schedule_interval(self.receive_helper, 0.5)
 
-    def message_send(self):
+    def message_send(self) -> None:
         """
         It sends the message after the user has pressed the "send" button
         """
@@ -103,14 +103,14 @@ class ChatMainPage(Screen):
         except (ConnectionAbortedError, ConnectionResetError):
             exit()
 
-    def start_receive_thread(self):
+    def start_receive_thread(self) -> None:
         """
         It starts the receiving thread
         """
         self.receive_thread = threading.Thread(target=self.receive)
         self.receive_thread.start()
 
-    def receive(self):
+    def receive(self) -> None:
         """
         It is constantly waiting for messages from the server, works in a thread
         """
@@ -123,7 +123,7 @@ class ChatMainPage(Screen):
             except ConnectionResetError:
                 exit()
 
-    def receive_helper(self, *aw):
+    def receive_helper(self, *aw) -> None:
         """
         Kivy can't change GUI elements outside the main thread so this method is needed
         """
