@@ -40,7 +40,7 @@ class EnterIP(Screen):
 
 
 class EnterNickname(Screen):
-    # This method is launched when user presses "enter"
+    # This method is launched when the user presses "enter"
     def check_if_nickname_is_entered(self):
         if len(self.nickname.text) > 0:
             self.check_if_nickname_is_taken()
@@ -68,7 +68,7 @@ class ChatMainPage(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
 
-        #This constantly adds to GUI the elements stored in add_to_gui
+        # This constantly adds to GUI the elements stored in add_to_gui
         Clock.schedule_interval(self.receive_helper, 0.5)
 
     # The method to send is called whenever the user presses the "send" button
