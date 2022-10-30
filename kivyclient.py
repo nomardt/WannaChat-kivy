@@ -18,7 +18,8 @@ try:
 except ModuleNotFoundError:
     pass
 
-except Exception:
+except Exception as e:
+    print(e)
     exit()
 
 
