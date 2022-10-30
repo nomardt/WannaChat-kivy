@@ -5,19 +5,22 @@ from loguru import logger
 
 def authenticate_new_users() -> None:
     """
-    The method is used to wait for new connections and start threads for new users
+    The method is used to wait for new connections 
+    and start threads for new users
     """
     while True:
         # Waiting for a new connection
         connection, address = server.accept()
         logger.success("New connection: " + str(address))
 
-        # Try except in case the user disconnects before choosing a nickname
+        # Try except in case the user disconnects 
+        # before choosing a nickname
         try:
             # Getting the nickname of the new user
             nickname = connection.recv(1024).decode('utf-8')
             
-            # Checking the nickname against the list of already occupied nicknames
+            # Checking the nickname against the list 
+            # of already occupied nicknames
             while nickname in nicknames:
                 connection.send("STATUS:FAILURE".encode('utf-8'))
                 nickname = connection.recv(1024).decode('utf-8')
@@ -29,7 +32,8 @@ def authenticate_new_users() -> None:
             generate_a_welcome_message(nickname)
 
             # Starting a thread for the newly connected client
-            threadie = threading.Thread(target=handle_the_connection, args=(connection, nickname))
+            threadie = threading.Thread(target=handle_the_connection, 
+                                        args=(connection, nickname))
             threadie.start()
 
         except Exception:
@@ -71,7 +75,8 @@ def broadcast(message) -> None:
 
 def generate_a_welcome_message(nickname) -> None:
     """
-    It broadcasts a random welcome message after the user has chosen a unique nickname
+    It broadcasts a random welcome message 
+    after the user has chosen a unique nickname
 
     :type nickname: str
     """
@@ -97,7 +102,7 @@ if __name__ == "__main__":
 
     logger.success("Server started at " + server_address)
 
-    # Waiting for connections that will be stored in the clients list
+    # Waiting for new connections
     clients = []
     nicknames = []
     authenticate_new_users()
