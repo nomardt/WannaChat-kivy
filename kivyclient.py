@@ -9,7 +9,6 @@ from kivy.uix.image import Image
 from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.lang import Builder
-from kivy.core.window import WindowBase
 from kivy.clock import Clock
 # Making the app look sharper on Windows systems
 try:
@@ -72,7 +71,7 @@ class EnterNickname(Screen):
             # Showing the result of the comparison in GUI
             self.label_enter_nick.text = "Nickname unavailable!"
 
-            # Deleting the input to prevent loop formation
+            # Removing the input to prevent loop formation
             self.nickname.text = ""
 
         else:
@@ -102,6 +101,7 @@ class ChatMainPage(Screen):
         try:
             client.send(self.entered_message.text.encode('utf-8'))
 
+            # Refreshing the text input field
             self.entered_message.text = ""
 
         except (ConnectionAbortedError, ConnectionResetError):
