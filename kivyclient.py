@@ -1,6 +1,6 @@
+import logging
 import socket
 import threading
-# pip install kivy
 from kivy import require as kivy_require
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     pass
 
 except Exception as e:
-    print(e)
+    logging.error(e)
     exit()
 
 
@@ -37,7 +37,7 @@ class EnterIP(Screen):
         try:
             client.connect((self.server_address, self.server_port))
 
-        except:
+        except Exception:
             # Prevent loop formation
             self.address.text = ""
 
@@ -156,29 +156,28 @@ class ChatMainPage(Screen):
         self.chat_history.text = chat_history_gui
         self.label_typing.text = ""
 
-        if len(who_is_typing) > 0:
-            for self.typing_user in who_is_typing.keys():
-                # Handling the case when only one user is typing
-                if len(who_is_typing) == 1:
-                    self.label_typing.text = self.typing_user + " is typing..."
+        for self.typing_user in who_is_typing:
+            # Handling the case when only one user is typing
+            if len(who_is_typing) == 1:
+                self.label_typing.text = self.typing_user + " is typing..."
 
-                # Handling the case when multiple users are typing but 
-                # everybody else is already present on the screen
-                elif self.typing_user == list(who_is_typing.keys())[-1]:
-                    self.label_typing.text += self.typing_user + " are typing..."
+            # Handling the case when multiple users are typing but 
+            # everybody else is already present on the screen
+            elif self.typing_user == list(who_is_typing)[-1]:
+                self.label_typing.text += self.typing_user + " are typing..."
 
-                # Handling the case when multiple users are typing
-                else:
-                    self.label_typing.text += self.typing_user + ", "
+            # Handling the case when multiple users are typing
+            else:
+                self.label_typing.text += self.typing_user + ", "
 
-                # Reducing the TTL of "user is typing" by 1
-                who_is_typing[self.typing_user] -= 1
+            # Reducing the TTL of "user is typing" by 1
+            who_is_typing[self.typing_user] -= 1
 
-            # Clearing the dictionary users currently typing from users with expired TTL
-            who_is_typing = {key:val for key, val in who_is_typing.items() if val != 0}
+        # Clearing the dictionary users currently typing from users with expired TTL
+        who_is_typing = {key:val for key, val in who_is_typing.items() if val != 0}
 
 
-    def user_typing(self):
+    def user_typing(self) -> None:
         """
         Broadcast to everybody that the user started typing
         """
@@ -188,7 +187,7 @@ class ChatMainPage(Screen):
         except (ConnectionAbortedError, ConnectionResetError):
             exit()
 
-    def remove_text_hint(self):
+    def remove_text_hint(self) -> None:
         """
         Remove "Enter your message" hint from the TextInput panel
         """

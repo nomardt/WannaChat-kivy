@@ -1,7 +1,6 @@
 import socket
 import threading
 import random
-#pip install loguru
 from loguru import logger
 
 def authenticate_new_users() -> None:
@@ -33,7 +32,7 @@ def authenticate_new_users() -> None:
             threadie = threading.Thread(target=handle_the_connection, args=(connection, nickname))
             threadie.start()
 
-        except:
+        except Exception:
             connection.close()
             logger.info(str(address) + " disconnected!")
 
@@ -51,7 +50,7 @@ def handle_the_connection(connection, nickname) -> None:
             message = connection.recv(1024).decode('utf-8')
             broadcast(nickname + " > " + message)
 
-        except:
+        except Exception:
             clients.remove(connection)
             nicknames.remove(nickname)
             connection.close()
