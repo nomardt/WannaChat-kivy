@@ -148,7 +148,8 @@ class ChatMainPage(Screen):
 
     def receive_helper(self, *aw) -> None:
         """
-        Kivy can't change GUI elements outside the main thread so this method is needed
+        Kivy can't change GUI elements outside the main thread 
+        so this method is needed
         """
         global who_is_typing
 
