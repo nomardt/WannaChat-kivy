@@ -44,7 +44,6 @@ class EnterIP(Screen):
             self.label_not_found.text = "Server not found!"
 
 
-# The second screen
 class EnterNickname(Screen):
     '''
     The second screen where the user enters her/his nickname
@@ -85,8 +84,8 @@ class EnterNickname(Screen):
 
 class ChatMainPage(Screen):
     '''
-    The third screen with the functionality to send messages and read
-    those written by other clients
+    The third screen with the functionality to send messages and 
+    read those written by other clients
     '''
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -162,8 +161,8 @@ class ChatMainPage(Screen):
                 if len(who_is_typing) == 1:
                     self.label_typing.text = self.typing_user + " is typing..."
 
-                # Handling the case when multiple users are typing but everybody
-                # else is already present on the screen
+                # Handling the case when multiple users are typing but 
+                # everybody else is already present on the screen
                 elif self.typing_user == list(who_is_typing.keys())[-1]:
                     self.label_typing.text += self.typing_user + " are typing..."
 
