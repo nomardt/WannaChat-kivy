@@ -43,7 +43,7 @@ def handle_the_connection(connection, nickname) -> None:
     It is put in a thread for every connected user with a nickname.
 
     :type connection: Socket object
-    :type nickname: string
+    :type nickname: str
     """
     while True:
         # Error will occur when the user disconnects from the server
@@ -62,9 +62,10 @@ def broadcast(message) -> None:
     """
     It sends the message to every connected client
 
-    :type message: string
+    :type message: str
     """
-    logger.info("BROADCAST | " + str(message))
+    if "STATUS:TYPING" not in message:
+        logger.info("BROADCAST | " + str(message))
     
     for client in clients:
         client.send(message.encode('utf-8'))
@@ -73,7 +74,7 @@ def generate_a_welcome_message(nickname) -> None:
     """
     It broadcasts a random welcome message after the user has chosen a unique nickname
 
-    :type nickname: string
+    :type nickname: str
     """
     messages = (
                nickname + " just connected!",

@@ -1,7 +1,10 @@
+import time
 import socket
 import threading
+import typing
+from dataclasses import dataclass
 # pip install kivy
-import kivy
+from kivy import require as kivy_require
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
@@ -24,9 +27,9 @@ except Exception:
 
 
 class EnterIP(Screen):
-    """
+    '''
     The first screen where the user enters the IP address of the server.
-    """
+    '''
     def establish_connection(self) -> None:
         """
         Establishing the connection after 'enter' is pressed
@@ -36,7 +39,7 @@ class EnterIP(Screen):
 
         try:
             client.connect((server_address, server_port))
-            
+
         except:
             # Prevent loop formation
             self.address.text = ""
@@ -47,21 +50,24 @@ class EnterIP(Screen):
 
 # The second screen
 class EnterNickname(Screen):
-    """
+    '''
     The second screen where the user enters her/his nickname
-    """
+    '''
     def check_if_nickname_is_entered(self) -> None:
         """
         Checking if the user has entered a nickname after she/he presses 'enter' 
         """
-        if len(self.nickname.text) > 0:
+        global my_nickname
+        my_nickname = self.nickname.text
+
+        if len(my_nickname) > 0:
             self.check_if_nickname_is_taken()
 
     def check_if_nickname_is_taken(self) -> None:
         """
         The nickname the user entered is checked against the server's list of nicknames
         """
-        client.send(self.nickname.text.encode('utf-8'))
+        client.send(my_nickname.encode('utf-8'))
 
         # The server returns 'STATUS:FAILURE' if the entered nickname is already present
         if client.recv(1024).decode('utf-8') == 'STATUS:FAILURE':
@@ -79,17 +85,17 @@ class EnterNickname(Screen):
 
 
 class ChatMainPage(Screen):
-    """
+    '''
     The third screen with the functionality to send messages and read the ones written by other clients
-    """
+    '''
     def __init__(self, **kw):
         """
         It refreshes the chat history window
         """
         super().__init__(**kw)
 
-        # This constantly adds to GUI the elements stored in add_to_gui
-        Clock.schedule_interval(self.receive_helper, 0.5)
+        # This constantly adds to GUI the elements stored in chat_history_gui
+        Clock.schedule_interval(self.receive_helper, 0.25)
 
     def message_send(self) -> None:
         """
@@ -99,7 +105,7 @@ class ChatMainPage(Screen):
             client.send(self.entered_message.text.encode('utf-8'))
 
             self.entered_message.text = ""
-            
+
         except (ConnectionAbortedError, ConnectionResetError):
             exit()
 
@@ -113,13 +119,39 @@ class ChatMainPage(Screen):
     def receive(self) -> None:
         """
         It is constantly waiting for messages from the server, works in a thread
+        called every 0.25 seconds
         """
-        global add_to_gui
+        global chat_history_gui
+        global who_is_typing
 
         while True:
             try:
-                add_to_gui += client.recv(1024).decode('utf-8') + "\n"
-                
+                # Waiting for new messages
+                just_received = client.recv(1024).decode('utf-8')
+
+                # Handling notifications that somebody else is typing
+                if "STATUS:TYPING" in just_received:
+                    if my_nickname not in just_received:
+                        # Setting TTL to the dictionary of users currently typing
+                        nickname_of_sender = just_received.split(" > ")[0]
+                        who_is_typing[nickname_of_sender] = 25
+                    
+                    else:
+                        pass
+
+                # Handling ordinary messages
+                elif " > " in just_received:
+                    # Preventing message forgery achieved by sending "\nAnother_user_nickname > "
+                    message_body = just_received.split(" > ")[1]
+                    message_body = message_body.replace(" > ", "")
+                    just_received = just_received.split(" > ")[0] + " > " + message_body
+
+                    chat_history_gui += just_received + "\n"
+
+                # Handling welcome messages, disconnected notifications
+                else:
+                    chat_history_gui += just_received + "\n"
+
             except ConnectionResetError:
                 exit()
 
@@ -127,7 +159,43 @@ class ChatMainPage(Screen):
         """
         Kivy can't change GUI elements outside the main thread so this method is needed
         """
-        self.chat_history.text = add_to_gui
+        global who_is_typing
+
+        self.chat_history.text = chat_history_gui
+        self.label_typing.text = ""
+
+        if len(who_is_typing) > 0:
+            for typing_user in who_is_typing.keys():
+                if len(who_is_typing) == 1:
+                    self.label_typing.text = typing_user + " is typing..."
+
+                elif typing_user == list(who_is_typing.keys())[-1]:
+                    self.label_typing.text += typing_user + " are typing..."
+
+                else:
+                    self.label_typing.text += typing_user + ", "
+
+                who_is_typing[typing_user] -= 1
+
+            # Clearing the dictionary from users with expired TTL
+            who_is_typing = {key:val for key, val in who_is_typing.items() if val != 0}
+
+
+    def user_typing(self):
+        """
+        Broadcast to everybody that the user started typing
+        """
+        try:
+            client.send("STATUS:TYPING".encode('utf-8'))
+
+        except (ConnectionAbortedError, ConnectionResetError):
+            exit()
+
+    def remove_text_hint(self):
+        """
+        Remove "Enter your message" hint from the TextInput panel
+        """
+        self.entered_message.hint_text = ""
 
 
 class Manager(ScreenManager):
@@ -141,10 +209,11 @@ class WannaChatApp(App):
 
 
 if __name__ == "__main__":
-    kivy.require("1.9.0")
+    kivy_require("1.9.0")
 
-    # String to store the chat history
-    add_to_gui = ""
+    chat_history_gui = "" # Global to store the chat history
+    who_is_typing = {}    # Global to store nicknames of who's typing
+    my_nickname = ""      # Global to store the nickname
 
     # Creating the client for the TCP connection
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
