@@ -1,8 +1,5 @@
-import time
 import socket
 import threading
-import typing
-from dataclasses import dataclass
 # pip install kivy
 from kivy import require as kivy_require
 from kivy.app import App
@@ -28,17 +25,17 @@ except Exception:
 
 class EnterIP(Screen):
     '''
-    The first screen where the user enters the IP address of the server.
+    The first screen where the user enters the IP address of the server
     '''
     def establish_connection(self) -> None:
         """
         Establishing the connection after 'enter' is pressed
         """
-        server_address = self.address.text
-        server_port = 12345
+        self.server_address = self.address.text
+        self.server_port = 12345
 
         try:
-            client.connect((server_address, server_port))
+            client.connect((self.server_address, self.server_port))
 
         except:
             # Prevent loop formation
@@ -67,6 +64,7 @@ class EnterNickname(Screen):
         """
         The nickname the user entered is checked against the server's list of nicknames
         """
+        # Sending the nickname the user has just entered in the InputField
         client.send(my_nickname.encode('utf-8'))
 
         # The server returns 'STATUS:FAILURE' if the entered nickname is already present
@@ -81,17 +79,17 @@ class EnterNickname(Screen):
             # Proceeding to the next screen if the nickname is available
             self.manager.current = "WannaChat_main"
 
-            ChatMainPage().start_receive_thread()
+            # This thread will be waiting for messages from the server
+            receive_thread = threading.Thread(target=ChatMainPage().receive)
+            receive_thread.start()
 
 
 class ChatMainPage(Screen):
     '''
-    The third screen with the functionality to send messages and read the ones written by other clients
+    The third screen with the functionality to send messages and read
+    those written by other clients
     '''
     def __init__(self, **kw):
-        """
-        It refreshes the chat history window
-        """
         super().__init__(**kw)
 
         # This constantly adds to GUI the elements stored in chat_history_gui
@@ -109,17 +107,10 @@ class ChatMainPage(Screen):
         except (ConnectionAbortedError, ConnectionResetError):
             exit()
 
-    def start_receive_thread(self) -> None:
-        """
-        It starts the receiving thread
-        """
-        self.receive_thread = threading.Thread(target=self.receive)
-        self.receive_thread.start()
-
     def receive(self) -> None:
         """
-        It is constantly waiting for messages from the server, works in a thread
-        called every 0.25 seconds
+        It is constantly waiting for messages from the server, 
+        works in a thread called every 0.25 seconds
         """
         global chat_history_gui
         global who_is_typing
@@ -127,30 +118,30 @@ class ChatMainPage(Screen):
         while True:
             try:
                 # Waiting for new messages
-                just_received = client.recv(1024).decode('utf-8')
+                self.just_received = client.recv(1024).decode('utf-8')
 
-                # Handling notifications that somebody else is typing
-                if "STATUS:TYPING" in just_received:
-                    if my_nickname not in just_received:
+                if "STATUS:TYPING" in self.just_received:
+                    # Handling notifications that somebody else is typing
+                    if my_nickname not in self.just_received:
                         # Setting TTL to the dictionary of users currently typing
-                        nickname_of_sender = just_received.split(" > ")[0]
+                        nickname_of_sender = self.just_received.split(" > ")[0]
                         who_is_typing[nickname_of_sender] = 25
                     
                     else:
                         pass
 
                 # Handling ordinary messages
-                elif " > " in just_received:
+                elif " > " in self.just_received:
                     # Preventing message forgery achieved by sending "\nAnother_user_nickname > "
-                    message_body = just_received.split(" > ")[1]
+                    message_body = self.just_received.split(" > ", 1)[1]
                     message_body = message_body.replace(" > ", "")
-                    just_received = just_received.split(" > ")[0] + " > " + message_body
+                    self.just_received = self.just_received.split(" > ")[0] + " > " + message_body
 
-                    chat_history_gui += just_received + "\n"
+                    chat_history_gui += self.just_received + "\n"
 
                 # Handling welcome messages, disconnected notifications
                 else:
-                    chat_history_gui += just_received + "\n"
+                    chat_history_gui += self.just_received + "\n"
 
             except ConnectionResetError:
                 exit()
@@ -161,23 +152,29 @@ class ChatMainPage(Screen):
         """
         global who_is_typing
 
+        # Refreshing the GUI
         self.chat_history.text = chat_history_gui
         self.label_typing.text = ""
 
         if len(who_is_typing) > 0:
-            for typing_user in who_is_typing.keys():
+            for self.typing_user in who_is_typing.keys():
+                # Handling the case when only one user is typing
                 if len(who_is_typing) == 1:
-                    self.label_typing.text = typing_user + " is typing..."
+                    self.label_typing.text = self.typing_user + " is typing..."
 
-                elif typing_user == list(who_is_typing.keys())[-1]:
-                    self.label_typing.text += typing_user + " are typing..."
+                # Handling the case when multiple users are typing but everybody
+                # else is already present on the screen
+                elif self.typing_user == list(who_is_typing.keys())[-1]:
+                    self.label_typing.text += self.typing_user + " are typing..."
 
+                # Handling the case when multiple users are typing
                 else:
-                    self.label_typing.text += typing_user + ", "
+                    self.label_typing.text += self.typing_user + ", "
 
-                who_is_typing[typing_user] -= 1
+                # Reducing the TTL of "user is typing" by 1
+                who_is_typing[self.typing_user] -= 1
 
-            # Clearing the dictionary from users with expired TTL
+            # Clearing the dictionary users currently typing from users with expired TTL
             who_is_typing = {key:val for key, val in who_is_typing.items() if val != 0}
 
 
