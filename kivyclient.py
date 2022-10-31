@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 import logging
 import socket
 import threading
@@ -10,7 +12,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.lang import Builder
 from kivy.clock import Clock
-# Making the app look sharper on Windows systems
+# Makes the program look sharper on Windows systems
 try:
     from ctypes import windll, c_int64
     windll.user32.SetProcessDpiAwarenessContext(c_int64(-4))
@@ -208,9 +210,9 @@ class WannaChatApp(App):
 if __name__ == "__main__":
     kivy_require("1.9.0")
 
-    chat_history_gui = "" # Global to store the chat history
-    who_is_typing = {}    # Global to store nicknames of who's typing
-    my_nickname = ""      # Global to store the nickname
+    chat_history_gui: str = ""         # Global to store the chat history
+    who_is_typing: dict[str, int] = {} # Global to store nicknames of who's typing
+    my_nickname: str = ""              # Global to store the nickname
 
     # Creating the client for the TCP connection
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

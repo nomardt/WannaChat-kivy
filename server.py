@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 import socket
 import threading
 import random
@@ -18,7 +20,7 @@ def authenticate_new_users() -> None:
         try:
             # Getting the nickname of the new user
             nickname = connection.recv(1024).decode('utf-8')
-            
+
             # Checking the nickname against the list 
             # of already occupied nicknames
             while nickname in nicknames:
@@ -45,7 +47,7 @@ def handle_the_connection(connection, nickname) -> None:
     This method receives the messages from the connected client.
     It is put in a thread for every connected user with a nickname.
 
-    :type connection: Socket object
+    :type connection: socket.socket
     :type nickname: str
     """
     while True:
@@ -103,6 +105,6 @@ if __name__ == "__main__":
     logger.success("Server started at " + server_address)
 
     # Waiting for new connections
-    clients = []
-    nicknames = []
+    clients: list[socket.socket] = []
+    nicknames: list[str] = []
     authenticate_new_users()

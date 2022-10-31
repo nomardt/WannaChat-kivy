@@ -85,6 +85,7 @@ Manager:
     chat_history: chat_history
     entered_message: entered_message
     button_send: button_send
+    label_typing: label_typing
 
     GridLayout:
         cols: 1
@@ -105,7 +106,8 @@ Manager:
                 cursor_width: 1
 
         Label:
-            text: "Enter your message"
+            id: label_typing
+            text: ""
             font_size: 35
             size_hint: (1, 0.2)
 
@@ -118,9 +120,13 @@ Manager:
                 multiline: True
                 font_size: 30
                 bold: True
-                focus: True
                 cursor_color: 0, 0, 0, 1
                 cursor_width: 7
+                hint_text: "Enter your message"
+                on_text:
+                    root.user_typing()
+                on_focus:
+                    root.remove_text_hint()
 
             Button:
                 id: button_send
