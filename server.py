@@ -51,7 +51,7 @@ def handle_the_connection(connection, nickname) -> None:
     :type nickname: str
     """
     while True:
-        # Error will occur when the user disconnects from the server
+        # Error will occur when a user disconnects from the server
         try:
             message = connection.recv(1024).decode('utf-8')
             broadcast(nickname + " > " + message)

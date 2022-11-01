@@ -13,6 +13,23 @@ Manager:
     label_not_found: label_not_found
 
     GridLayout:
+        size_hint: (1, 0.1)
+        cols: 2
+        pos: 0, root.height - root.height * 0.1
+
+        Button:
+            text: "x"
+            font_size: 38
+            halign: "left"
+            background_color: (0, 0, 0, 1)
+            size_hint: (0.1, 1)
+            
+            on_press:
+                app.close_application()
+
+        Label:
+
+    GridLayout:
         size_hint: (0.7, 0.9)
         pos_hint: {"center_x": 0.5, "center_y": 0.5}
         cols: 1
@@ -34,7 +51,7 @@ Manager:
             multiline: False
             padding_y: (20, 20)
             size_hint: (1, 0.35)
-            font_size: 30
+            font_size: 28
             halign: 'center'
             cursor_color: 0, 0, 0, 1
             cursor_width: 7
@@ -50,6 +67,23 @@ Manager:
     label_enter_nick: label_enter_nick
 
     GridLayout:
+        size_hint: (1, 0.1)
+        cols: 2
+        pos: 0, root.height - root.height * 0.1
+
+        Button:
+            text: "x"
+            font_size: 38
+            halign: "left"
+            background_color: (0, 0, 0, 1)
+            size_hint: (0.1, 1)
+            
+            on_press:
+                app.close_application()
+
+        Label:
+
+    GridLayout:
         size_hint: (0.7, 0.9)
         pos_hint: {"center_x": 0.5, "center_y": 0.5}
         cols: 1
@@ -63,7 +97,7 @@ Manager:
         
         Label:
             id: label_enter_nick
-            font_size:35
+            font_size: 35
             size_hint: (1, 0.15)
 
         TextInput:
@@ -71,7 +105,7 @@ Manager:
             multiline: False
             padding_y: (20, 20)
             size_hint: (1, 0.35)
-            font_size: 30
+            font_size: 28
             halign: 'center'
             cursor_color: 0, 0, 0, 1
             cursor_width: 7
@@ -86,6 +120,23 @@ Manager:
     entered_message: entered_message
     button_send: button_send
     label_typing: label_typing
+
+    GridLayout:
+        size_hint: (1, 0.1)
+        cols: 2
+        pos: 0, root.height - root.height * 0.1
+
+        Button:
+            text: "x"
+            font_size: 38
+            halign: "left"
+            background_color: (0, 0, 0, 1)
+            size_hint: (0.1, 1)
+            
+            on_press:
+                app.close_application()
+
+        Label:
 
     GridLayout:
         cols: 1

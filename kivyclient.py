@@ -3,6 +3,7 @@
 import logging
 import socket
 import threading
+from time import sleep
 from kivy import require as kivy_require
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -12,12 +13,13 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.lang import Builder
 from kivy.clock import Clock
+from kivy.core.window import Window
 # Makes the program look sharper on Windows systems
 try:
     from ctypes import windll, c_int64
     windll.user32.SetProcessDpiAwarenessContext(c_int64(-4))
 
-except ModuleNotFoundError:
+except ImportError:
     pass
 
 except Exception as e:
@@ -82,6 +84,7 @@ class EnterNickname(Screen):
 
             # This thread will be waiting for messages from the server
             receive_thread = threading.Thread(target=ChatMainPage().receive)
+            receive_thread.daemon = True
             receive_thread.start()
 
 
@@ -104,6 +107,7 @@ class ChatMainPage(Screen):
             client.send(self.entered_message.text.encode('utf-8'))
 
             # Refreshing the text input field
+            sleep(0.1)
             self.entered_message.text = ""
 
         except (ConnectionAbortedError, ConnectionResetError):
@@ -203,8 +207,22 @@ class Manager(ScreenManager):
 
 class WannaChatApp(App):
     def build(self):
-        kv = Builder.load_file('wannachat.kv')
-        return kv
+        self.kv = Builder.load_file('wannachat.kv')
+        return self.kv
+
+    def close_application(self):
+        """
+        This method is called when a user presses x
+        in the top-left corner
+        """
+        # Unloading the Builder file
+        Builder.unload_file('wannachat.kv')
+
+        # Closing the application
+        App.get_running_app().stop()
+
+        # Removing the window
+        Window.close()
 
 
 if __name__ == "__main__":
