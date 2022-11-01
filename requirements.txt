@@ -7,7 +7,6 @@ idna==3.4
 itsdangerous==2.1.2
 Jinja2==3.1.2
 Kivy==2.1.0
-kivy-deps.glew==0.3.1
 kivy-deps.sdl2==0.4.5
 Kivy-Garden==0.1.5
 loguru==0.6.0
