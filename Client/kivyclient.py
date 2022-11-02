@@ -111,7 +111,7 @@ class ChatMainPage(Screen):
             self.entered_message.text = ""
 
         except (ConnectionAbortedError, ConnectionResetError):
-            exit()
+            WannaChatApp().close_application()
 
     def receive(self) -> None:
         """
@@ -150,7 +150,7 @@ class ChatMainPage(Screen):
                     chat_history_gui += self.just_received + "\n"
 
             except ConnectionResetError:
-                exit()
+                WannaChatApp().close_application()
 
     def receive_helper(self, *aw) -> None:
         """
@@ -192,7 +192,7 @@ class ChatMainPage(Screen):
             client.send("STATUS:TYPING".encode('utf-8'))
 
         except (ConnectionAbortedError, ConnectionResetError):
-            exit()
+            WannaChatApp().close_application()
 
     def remove_text_hint(self) -> None:
         """
