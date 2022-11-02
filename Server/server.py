@@ -11,13 +11,11 @@ def authenticate_new_users() -> None:
     and start threads for new users
     """
     while True:
-        # Waiting for a new connection
-        connection, address = server.accept()
-        logger.success("New connection: " + str(address))
-
-        # Try except in case the user disconnects 
-        # before choosing a nickname
         try:
+            # Waiting for a new connection
+            connection, address = server.accept()
+            logger.success("New connection: " + str(address))
+
             # Getting the nickname of the new user
             nickname = connection.recv(1024).decode('utf-8')
 
