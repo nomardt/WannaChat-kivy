@@ -36,7 +36,7 @@ class EnterIP(Screen):
         Establishing the connection after 'enter' is pressed
         """
         self.server_address = self.address.text
-        self.server_port = 12345
+        self.server_port    = 12345
 
         try:
             client.connect((self.server_address, self.server_port))
@@ -139,8 +139,8 @@ class ChatMainPage(Screen):
                 # Handling ordinary messages
                 elif " > " in self.just_received:
                     # Preventing message forgery achieved by sending "\nAnother_user_nickname > "
-                    message_body = self.just_received.split(" > ", 1)[1]
-                    message_body = message_body.replace(" > ", "")
+                    message_body       = self.just_received.split(" > ", 1)[1]
+                    message_body       = message_body.replace(" > ", "")
                     self.just_received = self.just_received.split(" > ")[0] + " > " + message_body
 
                     chat_history_gui += self.just_received + "\n"
